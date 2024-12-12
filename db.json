@@ -1,0 +1,30 @@
+{
+  "status": 200,
+  "message": "BankDetails fetched Successfully.",
+  "data": [
+    {
+      "id": "1",
+      "bankName": "CBe",
+      "accountNumberPrefix": 100,
+      "accountNumberLength": 10
+    },
+    {
+      "id": "2",
+      "bankName": "BOA",
+      "accountNumberPrefix": 325,
+      "accountNumberLength": null
+    },
+    {
+      "id": "3",
+      "bankName": "BOA",
+      "accountNumberPrefix": 325,
+      "accountNumberLength": null
+    },
+    {
+      "id": "4",
+      "bankName": "BOW",
+      "accountNumberPrefix": 748,
+      "accountNumberLength": null
+    }
+  ]
+}
