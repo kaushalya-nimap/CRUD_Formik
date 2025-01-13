@@ -1,131 +1,77 @@
-import React, { useEffect, useState } from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
+import { useFormik } from 'formik'
+import React from 'react'
+import "./app.css"
+import { basicSchema } from './schema'
+
+const onSubmit=()=>{
+  console.log("Form submitted")
+}
 
 const App = () => {
-  const [bankDetails, setBankDetails] = useState([]);
-  const [currentBank, setCurrentBank] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const API_URL = "http://localhost:3001/data";
-
-  // Fetch bank details from API
-  const fetchBankDetails = async () => {
-    const response = await fetch(API_URL);
-    const data = await response.json();
-    setBankDetails(data);
-  };
-
-  useEffect(() => {
-    fetchBankDetails();
-  }, []);
-
-  // Add/Edit button handler
-  const handleAddEdit = (bank = null) => {
-    setCurrentBank(
-      bank || {
-        id: "",
-        bankName: "",
-        accountNumberPrefix: "",
-        accountNumberLength: "",
-      }
-    );
-    setIsEditing(true);
-  };
-
-  // Delete button handler
-  const handleDelete = (id) => {
-    const updatedBanks = bankDetails.filter((bank) => bank.id !== id);
-    setBankDetails(updatedBanks);
-  };
-
-  // Validation schema
-  const validationSchema = Yup.object({
-    bankName: Yup.string().required("Bank Name is required"),
-    accountNumberPrefix: Yup.string().required("Account Prefix is required"),
-    accountNumberLength: Yup.number()
-      .required("Account Number Length is required")
-      .positive("Must be a positive number")
-      .integer("Must be an integer"),
-  });
-
-  // Form submission handler
-  const handleFormSubmit = (values) => {
-    if (values.id) {
-      // Edit existing bank
-      const updatedBanks = bankDetails.map((bank) =>
-        bank.id === values.id ? values : bank
-      );
-      setBankDetails(updatedBanks);
-    } else {
-      // Add new bank
-      const newBank = { ...values, id: Date.now().toString() };
-      setBankDetails([...bankDetails, newBank]);
-    }
-    setIsEditing(false);
-  };
-
+  const {values,errors,touched,handleBlur,handleChange,handleSubmit}=useFormik({
+    initialValues:{
+      email:'',
+      age:'',
+      password:'',
+      confirmPassword:''
+    },
+    validationSchema:basicSchema,
+    onSubmit,
+  })
+  console.log("errors",errors)
   return (
-    <div className="bank-container">
-      <table className="table">
-        <thead className="thead">
-          <tr>
-            <th>Id</th>
-            <th>Bank Name</th>
-            <th>Account Prefix</th>
-            <th>Account Number Length</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody className="tbody">
-          {bankDetails.map((bank) => (
-            <tr key={bank.id}>
-              <td>{bank.id}</td>
-              <td>{bank.bankName}</td>
-              <td>{bank.accountNumberPrefix}</td>
-              <td>{bank.accountNumberLength}</td>
-              <td>
-                <button onClick={() => handleAddEdit(bank)}>Edit</button>
-                <button onClick={() => handleDelete(bank.id)}>Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <button onClick={() => handleAddEdit()}>Add New</button>
+    <form onSubmit={handleSubmit} autoComplete='off' style={{display:"flex",flexDirection:"column"}}>
+      <label htmlFor='email'> Email</label>
+        <input
+          id='email'
+          type='email'
+          placeholder='Please enter your mail'
+          value={values.email}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          className={errors.email && touched.email? "error-class":""} 
+        />
+        {errors.email&&touched.email&&<p className='error'>{errors.email}</p>}
+     
+      <label htmlFor='age'>Age</label>
+        <input
+          id='age'
+          type='number'
+          placeholder='Enter your age'
+          value={values.age}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          className={errors.age && touched.email? "error-class":""}
+        />
+       {errors.age&&touched.age&&<p className='error'>{errors.age}</p>} 
+      
+      <label htmlFor='password'>Password</label>
+        <input
+          id='password'
+          type='password'
+          placeholder='Enter a password'
+          value={values.password}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          className={errors.password && touched.email? "error-class":""}
+        />
+      {errors.password&&touched.password&&<p className='error'>{errors.password}</p>}  
+      
+      <label htmlFor='confirm-password'>Confirm Password</label>
+      <input
+        id='confirmPassword'
+        type='password'
+        placeholder='Confirm password'
+        value={values.confirmPassword}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        className={errors.confirmPassword && touched.email? "error-class":""}
+      />
+      {errors.confirmPassword&&touched.confirmPassword&&<p className='error'>{errors.confirmPassword}</p>}
+      <button type='submit'>Submit</button>
 
-      {isEditing && (
-        <Formik
-          initialValues={currentBank}
-          validationSchema={validationSchema}
-          onSubmit={handleFormSubmit}
-        >
-          {({ handleSubmit }) => (
-            <Form onSubmit={handleSubmit}>
-              <div>
-                <label>Bank Name:</label>
-                <Field name="bankName" type="text" />
-                <ErrorMessage name="bankName" component="div" />
-              </div>
-              <div>
-                <label>Account Prefix:</label>
-                <Field name="accountNumberPrefix" type="text" />
-                <ErrorMessage name="accountNumberPrefix" component="div" />
-              </div>
-              <div>
-                <label>Account Number Length:</label>
-                <Field name="accountNumberLength" type="number" />
-                <ErrorMessage name="accountNumberLength" component="div" />
-              </div>
-              <button type="submit">Save</button>
-              <button type="button" onClick={() => setIsEditing(false)}>
-                Cancel
-              </button>
-            </Form>
-          )}
-        </Formik>
-      )}
-    </div>
-  );
-};
+    </form>
+  )
+}
 
-export default App;
+export default App
